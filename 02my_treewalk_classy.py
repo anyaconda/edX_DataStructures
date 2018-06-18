@@ -9,6 +9,7 @@ Problem 2: Walk the tree prep - manually walk a tree with 3 levels or 6 levels
 import numpy as np
 import sys
 sys.setrecursionlimit(10**1) # max depth of recursion
+import time #to track time
 
 class Node:
 
@@ -18,33 +19,14 @@ class Node:
         self._parent = parent
         self._child = []
         self._root = parent == -1
+        #self._seen = False
 
-    #--accessor functions
-    def get_parent(self):
-        return self._parent
-
-    def has_child(self):
-        if self.howManyChildren() > 0:
-            #node_level += 1
-            return True
-        else:
-            return False
-
-    def howManyChildren(self):
-        return len(self._child)
-
-    def get_child(self):
-        return self._child
-
-
-    #--setter functions
-    def add_parent(self, p):
-        self._parent = p
-
+    # --setter functions
     def add_child(self, c):
         self._child.append(c)
 
-    def traverseUp(self):
+    #traverse up each node ($actodo: keep track of seen nodes
+    def traverseUp(self, this_nodes):
         me = self
         done = False
 
@@ -52,25 +34,49 @@ class Node:
             if me._root:
                 done = True
             else:
-                descendants.append(self._parent)
-                #print(descendants)
-                me = nodes[descendants[len(descendants)-1]]
-                me.traverseUp()
+                ancestors.append(self._parent)
+                me = this_nodes[ancestors[len(ancestors) - 1]]
+                me.traverseUp(this_nodes)
 
-            return descendants
-
+            return ancestors
 
 #define Tree class: n is number of nodes, parent is the index of parent node
 class Tree:
 
     def read(self):
-        temp = '8 8 5 6 7 3 1 6 -1 5'
-        self.parent = list(map(int, temp.split()))
+        #temp = '8 8 5 6 7 3 1 6 -1 5'
+        #self.parent = list(map(int, temp.split()))
         # print('my lentth', len(self.parent))
 
-        self.n = 10 #int(sys.stdin.readline())
-        #self.parent = [4, -1, 4, 1, 1] #[-1, 0, 4, 0, 3] #list(map(int, sys.stdin.readline().split()))
+        self.n = 5 #int(sys.stdin.readline())
+        self.parent = [4, -1, 4, 1, 1] #[-1, 0, 4, 0, 3] #list(map(int, sys.stdin.readline().split()))
 
+
+    def build(self):
+        # allocate Nodes array
+        nodes = list(range(self.n))
+        for i in range(0, len(nodes)):
+            nodes[i] = Node(i, self.parent[i])
+
+        # assign kids based on parents
+        for child_idx in range(0, len(nodes)):
+            parent_idx = nodes[child_idx]._parent
+            # print (parent_idx)
+            if parent_idx == -1:
+                root_idx = child_idx
+            else:
+                nodes[parent_idx].add_child(nodes[child_idx])
+
+        #print ('Tree built')
+        return nodes
+
+    def get_leaf_idx(self):
+        # allocate Nodes array
+        leaf_nodes = []
+        leaf_nodes = [elem for elem in range(0,self.n) if elem not in self.parent]
+
+        print("leaf idx ", leaf_nodes)
+        return leaf_nodes
 
     def compute_height_was(self):
         # Replace this code with a faster implementation
@@ -86,64 +92,45 @@ class Tree:
 
     def compute_height(self):
         height = 0
-        for node in nodes:
-            descendants = []
-            print('---')
-            descendants.append(node._label)
 
-            if not node._root:
-                print('not root')
-            else:
-                print('root')
-            print(node.traverseUp())
+        nodes = self.build()
+        leaf_idx = self.get_leaf_idx()
+        leaf_nodes = []
+        leaf_nodes = [ elem for elem in nodes if elem._label in leaf_idx ]
+        print('leaf nodes ', leaf_nodes)
 
-            if len(descendants) > height:
-                height = len(descendants)
+        for node in leaf_nodes:
+            print ('leaf node ', node._label)
+            ancestors.clear()
+            ancestors.append(node._label)
+            node.traverseUp(nodes)
+
+            if len(ancestors) > height:
+                height = len(ancestors)
         return height
 
 
 
 #---- MAIN --------
+start_time = time.time()
+
+global ancestors
+ancestors = []
+
 #read an incoming tree
 myTree = Tree()
 myTree.read()
-print(myTree.n, ' nodes')
-print(myTree.parent)
+#print(myTree.parent)
+#was print(tree.compute_height())
 
-#allocate Nodes array
-nodes = list(range(myTree.n))
-for i in range(0, len(nodes)):
-    nodes[i] = Node(i, myTree.parent[i])
-
-#assign kids based on parents
-for child_idx in range(0, len(nodes)):
-    parent_idx = nodes[child_idx]._parent
-    #print (parent_idx)
-    if parent_idx == -1:
-        root_idx = child_idx
-    else:
-        nodes[parent_idx].add_child(nodes[child_idx])
-
-#traverse with class
+# traverseUp with class Node
 print ('\nTraverse - using recursion')
+print(myTree.compute_height())
 
-#compute tree height
-height = 0
-for node in nodes:
-    descendants = []
-    print('---')
-    descendants.append(node._label)
+#track time
+elapsed_time = time.time() - start_time
+print('done in ', elapsed_time)
 
-    if not node._root:
-        print('not root')
-    else:
-        print('root')
-    print (node.traverseUp())
-
-    if len(descendants) > height:
-        height = len(descendants)
-
-print (height)
 
 """
 output
