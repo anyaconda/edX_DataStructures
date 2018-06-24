@@ -5,10 +5,13 @@
 #   given: #of nodes and parents index
 #   compute tree height, using recursion
 #
-# submission #6 addendum
-#   only looking at leaf nodes - less memory but still time limit exceeded
-#   switched from list to array - more memory and more time than previous
-#   (not tracking ancestors)
+# submission #7
+#   modified original function computeHeight
+#   only looking at leaf nodes
+# results
+#   Failed case #18/24: time limit exceeded
+#   Time used: 3.45/3.00, memory used: 44929024/536870912.
+
 
 
 import sys, threading
@@ -23,31 +26,24 @@ class Tree:
     def read(self):
         self.n = int(sys.stdin.readline())
         self.parent = list(map(int, sys.stdin.readline().split()))
-        # allocate arrays
-        self.idx = np.arange(self.n)
-        self.parent_idx = np.array(self.parent)
+        self.me = list(range(self.n))
+        # find leaves
+        self.leaves = list(set(self.me) - set(self.parent))
 
+    # my recursive function - only look at leaves
+    def compute_height(self):
 
-    def leaf_idx(self):
-        # find the set difference
-        leaf_idx = np.setdiff1d(self.idx, self.parent_idx)
-        #print('tree leaves: ', leaf_idx)
+        maxHeight = 0
+        for vertex in self.leaves:
+            height = 0
+            i = vertex
+            while i != -1:
+                height += 1
+                i = self.parent[i]
+            maxHeight = max(maxHeight, height);
+        return maxHeight;
 
-        return leaf_idx
-
-    def set_level(self):
-        self.level = 1
-
-    # traverse up each node - recursive
-    def traverseNodeUp(self, n_idx):
-        node_parent_idx = self.parent_idx[n_idx]
-
-        if node_parent_idx!=-1:
-            self.level += 1
-            self.traverseNodeUp(node_parent_idx)
-
-        return self.level  # len(ancestors)
-
+    # original from starter solution
     # def compute_height(self):
     #     # Replace this code with a faster implementation
     #     maxHeight = 0
@@ -63,21 +59,7 @@ class Tree:
 def main():
     myTree = Tree()
     myTree.read()
-    # print(myTree.compute_height())
-
-    # find leaves only
-    tree_leaves = myTree.leaf_idx()
-
-    max_height = 0
-
-    for n_idx in tree_leaves:
-        # print('arr ', node)
-        myTree.set_level()
-        height = myTree.traverseNodeUp(n_idx)
-        # print(height)
-        max_height = max(height, max_height)
-
-    print(max_height)
+    print(myTree.compute_height())
 
 
 threading.Thread(target=main).start()
