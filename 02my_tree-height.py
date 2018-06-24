@@ -1,11 +1,15 @@
 # python3
-"""
+
 # Description: edX UCSanDiegoX: ALGS201x PA#1
 # Problem 2: Tree Height
 #   given: #of nodes and parents index
 #   compute tree height, using recursion
+#
+# submission #6 addendum
 #   only looking at leaf nodes - less memory but still time limit exceeded
-"""
+#   switched from list to array - more memory and more time than previous
+#   (not tracking ancestors)
+
 
 import sys, threading
 import numpy as np
