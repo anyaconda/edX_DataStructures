@@ -7,8 +7,12 @@
 #
 # After submission 7
 #   after tree leaves (accurate but slow), need to improve performance
-#   try pre-order traverse
-#   so far vertex.add is working, vertex.pop needs fixing
+#   forget computeHeight for now
+#
+#   print pre-order traverse - verbose
+#   correct pre-order stacks
+#   ex1.[1, 3, 4, 0, 2]
+#   ex2.[8, 0, 1, 6, 3, 5, 2, 9, 7, 4]
 
 import sys, threading
 import time #to track time
@@ -16,7 +20,9 @@ sys.setrecursionlimit(10**3) # max depth of recursion
 
 #define Tree class: n is number of nodes, parent is the index of parent node
 class Tree:
-    stack = []
+    # track pre-order traversal
+    preStack = []
+    moreChildren = 1
 
     def read(self):
         # print('my lentth', len(self.parent))
@@ -25,50 +31,51 @@ class Tree:
         #self.parent = list(map(int, sys.stdin.readline().split()))
 
         # hardcoded examples
+        #ex1
         self.n = 5  # int(sys.stdin.readline())
         self.parent = [4, -1, 4, 1, 1]  # [-1, 0, 4, 0, 3]
 
+        #ex2
         #self.n = 10
         #temp = '8 8 5 6 7 3 1 6 -1 5'
         #self.parent = list(map(int, temp.split()))
 
         self.me = list(range(self.n))
 
-    def compute_height(self):
-        # Replace this code with a faster implementation
-        maxHeight = 0
+    def printPreorder(self):
+        print ('print tree pre-order traversal')
 
-        #start with root
-        root = [k for k,v in enumerate(self.parent) if v==-1]
+        # start with root - must be one root only!
+        root = [k for k, v in enumerate(self.parent) if v == -1]
         root_idx = root[0]
+        Tree.preStack.append(root_idx)
+        print('Starting stack', Tree.preStack)
 
-        #pre-order traversal - add parent node to stack
-        Tree.stack.append(root_idx)
-        print ('Starting stack', Tree.stack[len(Tree.stack) - 1])
+        i = Tree.preStack[len(Tree.preStack) - 1]
 
-        i = Tree.stack[len(Tree.stack) - 1]
-        #call recursive function
-        self.findChildIdx(i)
+        while Tree.moreChildren:
+            # call recursive function
+            i = self.preOrderTraverse(i)
 
-        return ('Not computing max height yet')
+        print (Tree.preStack)
 
-    #recursive function
-    def findChildIdx(self, node_idx):
-        print('stack so far:', Tree.stack)
 
+    def preOrderTraverse(self, node_idx):
+        print('stack so far:', Tree.preStack)
         child_idx = [i for i, x in enumerate(self.parent) if x == node_idx]
         print('child found', child_idx)
 
         if len(child_idx) > 0:
 
             for item_idx in child_idx:
-                Tree.stack.append(item_idx)
-                self.findChildIdx(item_idx)
+                Tree.preStack.append(item_idx)
+                self.preOrderTraverse(item_idx)
 
         else:
             print('no children for node ', node_idx)
-            Tree.stack.pop()
-            print('stack after leaves no children:', Tree.stack)
+            print('stack after leaves no children:', Tree.preStack)
+            Tree.moreChildren = 0
+
 
 
 #---- MAIN --------
@@ -78,8 +85,7 @@ def main():
 
     myTree = Tree()
     myTree.read()
-    # original call to compute tree height
-    print(myTree.compute_height())
+    myTree.printPreorder()
 
     # track time
     elapsed_time = time.time() - start_time
