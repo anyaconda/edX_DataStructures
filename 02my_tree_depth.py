@@ -5,8 +5,8 @@
 #   given: #of nodes and parents index
 #   compute tree height, using recursion
 #
-# For submission 8
-#   returned to computeHeight again
+# After submission 8
+#   computeHeight
 #
 #   successfully traversed - dfs, both pre-order and post-order
 #   correct pre-order stacks
@@ -16,11 +16,13 @@
 #   ex1.[3, 0, 2, 4, 1]
 #   ex2.[0, 2, 9, 5, 3, 4, 7, 6, 1, 8]
 
-#   here: use post-order traverse to compute height
+#   prev: use post-order traverse to compute height
 #   using python numpy array (previously list datastruct)
 #   which fixed issue: takes a long time to build tree, aka get kids, with lists and looping
 #   correct and faster but still too slow (case #16 took 6.04 sec)
-#   test tip: don't run on more than 100 nodes
+#   test tip: ok to run on 100K nodes (for anything starting with submission 8)
+#
+#   here: a little clean up to shave off micros seconds in computeHeight function
 
 import numpy as np
 import time #to track time
@@ -46,18 +48,13 @@ class Tree:
         #ex1
         #self.n = 5  # int(sys.stdin.readline())
         #temp = '4 -1 4 1 1' #[-1, 0, 4, 0, 3] #
-        #self.parent = np.array(temp.split(), int)
         #ex2
         #self.n = 10
         #temp = '8 8 5 6 7 3 1 6 -1 5'
-        #self.parent = list(map(int, temp.split()))
+        #self.parent = np.array(temp.split(), int)
 
         #build tree
-        self.root = self.setRoot()
-
-    def setRoot(self):
-        self.root = np.where(self.parent == -1)
-        return self.root[0][0]
+        self.root = np.where(self.parent == -1)[0][0]
 
     def computeHeight(self, node):
         kids = np.where(self.parent == node)[0]
@@ -71,15 +68,14 @@ class Tree:
         for kid in kids:
             self.nodeDone = False
             ##self.TraversePostOrder(kid)
-            if not self.nodeDone:
-                self.height += 1
+            ##if not self.nodeDone:
+            self.height += 1
             self.computeHeight(kid)
             # self.postStack.append(node)
         self.nodeDone = True
         self.maxHeight = max(self.maxHeight, self.height)
         self.height -= 1
 
-        return self.maxHeight
 
     # track traversal
     # preStack = []
@@ -114,7 +110,8 @@ def main():
 
     #print('Tree root ', myTree.root)
     #print('Tree kids ', myTree.kids)
-    print(myTree.computeHeight(myTree.root))
+    myTree.computeHeight(myTree.root)
+    print (myTree.maxHeight)
 
     #myTree.TraversePreOrder(myTree.root)
     #print ('Pre-order traversal', myTree.preStack)
