@@ -5,12 +5,12 @@
 #   given: #of nodes and parents index
 #   compute tree height, using recursion
 #
-# submission #7
+# submission #8
 #   modified original function computeHeight
-#   only looking at leaf nodes
+#   array instead of list, recursive compute; no longer looking at leaf nodes
 # results
-#   Failed case #18/24: time limit exceeded
-#   Time used: 3.45/3.00, memory used: 44929024/536870912.
+#   Failed case #16/24: time limit exceeded
+#   Time used: 6.04/3.00, memory used: 37822464/536870912.
 
 
 
@@ -22,26 +22,40 @@ threading.stack_size(2**27)  # new thread will get stack of such size
 
 #define Tree class: n is number of nodes, parent is the index of parent node
 class Tree:
+    height = 1
+    maxHeight = 0
 
     def read(self):
         self.n = int(sys.stdin.readline())
-        self.parent = list(map(int, sys.stdin.readline().split()))
-        self.me = list(range(self.n))
-        # find leaves
-        self.leaves = list(set(self.me) - set(self.parent))
+        self.parent = np.array(sys.stdin.readline().split(), int)
+        self.root = self.setRoot()
+
+    def setRoot(self):
+        self.root = np.where(self.parent == -1)
+        return self.root[0][0]
 
     # my recursive function - only look at leaves
-    def compute_height(self):
+    def compute_height(self, node):
 
-        maxHeight = 0
-        for vertex in self.leaves:
-            height = 0
-            i = vertex
-            while i != -1:
-                height += 1
-                i = self.parent[i]
-            maxHeight = max(maxHeight, height);
-        return maxHeight;
+        kids = np.where(self.parent == node)[0]
+
+        if not kids.any:
+            ##self.postStack.append(node)
+            self.nodeDone = True
+            self.maxHeight = max(self.maxHeight, self.height)
+            self.height -= 1
+            return
+        for kid in kids:
+            self.nodeDone = False
+            ##self.TraversePostOrder(kid)
+            if not self.nodeDone:
+                self.height += 1
+            self.compute_height(kid)
+            # self.postStack.append(node)
+        self.nodeDone = True
+        self.maxHeight = max(self.maxHeight, self.height)
+        self.height -= 1
+        return self.maxHeight
 
     # original from starter solution
     # def compute_height(self):
@@ -59,7 +73,7 @@ class Tree:
 def main():
     myTree = Tree()
     myTree.read()
-    print(myTree.compute_height())
+    print(myTree.compute_height(myTree.root))
 
 
 threading.Thread(target=main).start()
