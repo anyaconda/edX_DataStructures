@@ -13,7 +13,7 @@
 #   strategy: start with leaves, recursively look at parents until end up with the root node (or more)
 #   main datastruct array, no more lists or sets
 #
-# submission #9 - much progress.  progressed to case #22
+# after submission #9 - slight improvements shaving off seconds
 #   modified original function computeHeight
 #   array instead of list, recursive compute; looking at leaf nodes only
 # results
@@ -59,14 +59,15 @@ class Tree:
             parents_clean = np.unique(parents)
             self.height += 1
             #print (parents_clean)
-            #print(parents_clean.size)
 
-            if np.where(parents_clean==-1)[0]==0 and parents_clean.size==1:
-                self.done = 1
-            else:
+            if parents_clean.size>1:
                 parents_clean = parents_clean[parents_clean != -1]
-
                 self.compute_height(parents_clean)
+            elif np.where(parents_clean==-1)[0]!=0 and parents_clean.size==1:
+                self.compute_height(parents_clean)
+            else:
+                self.done = 1
+
 
 
     # # my recursive function1 - only look at leaves
