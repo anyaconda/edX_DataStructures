@@ -45,8 +45,11 @@ class Tree:
         #self.parent = np.array(temp.split(), int)
 
         self.idx = np.arange(self.n)
+        #get root
+        self.root = np.where(self.parent==-1)[0][0]
         # find leaves
         self.leaves = np.setdiff1d(self.idx, self.parent)
+        #print ("leaves ", self.leaves.size)
 
     # my recursive function - only look at leaves
     height = 0
@@ -55,16 +58,21 @@ class Tree:
     def compute_height(self, nodes):
 
         while not self.done:
+            #print ('nodes ', nodes)
             parents = self.parent[nodes]
-            parents_clean = np.unique(parents)
             self.height += 1
-            #print (parents_clean)
 
-            if parents_clean.size>1:
-                parents_clean = parents_clean[parents_clean != -1]
-                self.compute_height(parents_clean)
-            elif np.where(parents_clean==-1)[0]!=0 and parents_clean.size==1:
-                self.compute_height(parents_clean)
+            #print('parents before', parents)
+
+            done_idx = np.where(parents<0)[0]
+            #print ('done idx', done_idx)
+
+            if done_idx.size < self.leaves.size:
+                parents[done_idx]= self.root
+                #print('parents after', parents)
+
+                #parents_clean = parents_clean[parents_clean != -1]
+                self.compute_height(parents)
             else:
                 self.done = 1
 
