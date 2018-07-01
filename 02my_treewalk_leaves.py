@@ -19,6 +19,15 @@
 # results
 #   Failed case #22/24: time limit exceeded
 #   Time used: 6.12/3.00, memory used: 1149603840/536870912.
+#
+# last change: no resizing of array
+#   start with leaves, size of array = n of leaves
+#   find leaves parents (recursively), if encounter -1 set back to root node value
+#   do until last level all equal root
+#   count # of levels.
+#   best performance so far, but short of required 3 seconds for case #22, 23
+#
+#  next: build a matrix and just count number of rows in matrix
 
 
 import sys, threading
@@ -49,33 +58,29 @@ class Tree:
         self.root = np.where(self.parent==-1)[0][0]
         # find leaves
         self.leaves = np.setdiff1d(self.idx, self.parent)
-        #print ("leaves ", self.leaves.size)
+        self.parents = np.arange(self.leaves.size)
 
     # my recursive function - only look at leaves
     height = 0
     done = 0
 
+
     def compute_height(self, nodes):
 
         while not self.done:
-            #print ('nodes ', nodes)
-            parents = self.parent[nodes]
             self.height += 1
+            self.parents = self.parent[nodes]
 
-            #print('parents before', parents)
+            #look for nodes that found root
+            done_idx = np.where(self.parents < 0)[0]
+            #replace that node with value of root node so that code won't choke
+            self.parents[done_idx] = self.root
 
-            done_idx = np.where(parents<0)[0]
-            #print ('done idx', done_idx)
-
-            if done_idx.size < self.leaves.size:
-                parents[done_idx]= self.root
-                #print('parents after', parents)
-
-                #parents_clean = parents_clean[parents_clean != -1]
-                self.compute_height(parents)
+            #check if this level still has nodes to process
+            if not done_idx.size==self.leaves.size:
+                self.compute_height(self.parents)
             else:
-                self.done = 1
-
+                self.done=1
 
 
     # # my recursive function1 - only look at leaves
