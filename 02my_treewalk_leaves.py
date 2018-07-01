@@ -20,7 +20,7 @@
 #   Failed case #22/24: time limit exceeded
 #   Time used: 6.12/3.00, memory used: 1149603840/536870912.
 #
-# last change: no resizing of array
+# last change: using np.where for ternary logic
 #   start with leaves, size of array = n of leaves
 #   find leaves parents (recursively), if encounter -1 set back to root node value
 #   do until last level all equal root
@@ -64,20 +64,17 @@ class Tree:
     height = 0
     done = 0
 
-
     def compute_height(self, nodes):
 
         while not self.done:
             self.height += 1
-            self.parents = self.parent[nodes]
+            self.parents = np.where(nodes > -1, self.parent[nodes], -1)
 
             #look for nodes that found root
-            done_idx = np.where(self.parents < 0)[0]
-            #replace that node with value of root node so that code won't choke
-            self.parents[done_idx] = self.root
+            if not np.argwhere(self.parents == -1).size==self.leaves.size:
 
             #check if this level still has nodes to process
-            if not done_idx.size==self.leaves.size:
+            #if not done_idx.size==self.leaves.size:
                 self.compute_height(self.parents)
             else:
                 self.done=1
@@ -117,7 +114,7 @@ def main():
 
     myTree = Tree()
     myTree.read()
-    # original call to compute tree height
+    # compute tree height
     myTree.compute_height(myTree.leaves)
     print(myTree.height)
 
