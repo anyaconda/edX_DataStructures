@@ -5,7 +5,7 @@
 #   given: #of nodes and parents index
 #   compute tree height, using recursion
 #
-# submission #11
+# submission #12
 #   modified original function computeHeight
 #   looking at leaves only
 # results
@@ -18,7 +18,7 @@
 #   count # of levels.
 #   best performance so far, but short of required 3 seconds for case #22, 23
 #
-# last change: no longer passing nodes
+# last change: not using flag 'done'
 
 
 import sys, threading
@@ -50,23 +50,15 @@ class Tree:
 
 
     # my recursive function - only look at leaves
-    height = 0
-    done = 0
-
     def compute_height(self):
+        height = 0
 
-        while not self.done:
+        while not np.all(self.leaves == -1):
             #print (self.leaves)
-            self.height += 1
+            height += 1
             self.leaves = np.where(self.leaves > -1, self.parent[self.leaves], -1)
 
-            # look for nodes that still have parents
-            if not np.all(self.leaves == -1):
-                self.compute_height()
-            else:
-                self.done=1
-
-        return self.height
+        return height
 
 
     # # my recursive function1 - only look at leaves
@@ -105,26 +97,9 @@ def main():
     myTree.read()
     # compute tree height
     print (myTree.compute_height())
-    #print(myTree.height)
 
     # track time
     elapsed_time = time.time() - start_time
     print('done in ', elapsed_time)
 
 threading.Thread(target=main).start()
-
-# initialize to store levels, starting with leaves and finding parents
-#    list_levels = []
-
-    # def compute_levels(self):
-    #     parents = self.parent[self.leaves]
-    #     # look for nodes that found root
-    #     done_idx = np.where(self.parents < 0)[0]
-    #     # replace that node with value of root node so that code won't choke
-    #     self.parents[done_idx] = self.root
-    #     self.list_levels.append(parents)
-    #
-    #     #check if all leaves found root
-    #     if not done_idx.size == self.leaves.size:
-    #         #ac stopped here
-    #         print (self.list_levels)
