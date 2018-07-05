@@ -5,29 +5,20 @@
 #   given: #of nodes and parents index
 #   compute tree height, using recursion
 #
-# After submission 8, failed case #16 time limit exceeded
-#   computeHeight - returned to going through leaves, previous success with speed
-#
-#   only looking at leaf nodes - reduce unnecessary trips to non-leaves
-#   lists and diff between 2 lists
-#   strategy: start with leaves, recursively look at parents until end up with the root node (or more)
-#   main datastruct array, no more lists or sets
-#
-# after submission #9 - slight improvements shaving off seconds
+# submission #11
 #   modified original function computeHeight
-#   array instead of list, recursive compute; looking at leaf nodes only
+#   looking at leaves only
 # results
 #   Failed case #22/24: time limit exceeded
-#   Time used: 6.12/3.00, memory used: 1149603840/536870912.
+#   Time used: 6.51/3.00, memory used: 56582144/536870912
 #
-# last change: using np.where for ternary logic
+# summary: using np.where for ternary logic
 #   start with leaves, size of array = n of leaves
-#   find leaves parents (recursively), if encounter -1 set back to root node value
-#   do until last level all equal root
+#   find leaves parents (recursively), when done set to -1
 #   count # of levels.
 #   best performance so far, but short of required 3 seconds for case #22, 23
 #
-#  next: build a matrix and just count number of rows in matrix
+# last change: no longer passing nodes
 
 
 import sys, threading
@@ -54,30 +45,28 @@ class Tree:
         #self.parent = np.array(temp.split(), int)
 
         self.idx = np.arange(self.n)
-        #get root
-        self.root = np.where(self.parent==-1)[0][0]
         # find leaves
         self.leaves = np.setdiff1d(self.idx, self.parent)
-        self.parents = np.arange(self.leaves.size)
+
 
     # my recursive function - only look at leaves
     height = 0
     done = 0
 
-    def compute_height(self, nodes):
+    def compute_height(self):
 
         while not self.done:
+            #print (self.leaves)
             self.height += 1
-            self.parents = np.where(nodes > -1, self.parent[nodes], -1)
+            self.leaves = np.where(self.leaves > -1, self.parent[self.leaves], -1)
 
-            #look for nodes that found root
-            if not np.argwhere(self.parents == -1).size==self.leaves.size:
-
-            #check if this level still has nodes to process
-            #if not done_idx.size==self.leaves.size:
-                self.compute_height(self.parents)
+            # look for nodes that still have parents
+            if not np.all(self.leaves == -1):
+                self.compute_height()
             else:
                 self.done=1
+
+        return self.height
 
 
     # # my recursive function1 - only look at leaves
@@ -115,11 +104,27 @@ def main():
     myTree = Tree()
     myTree.read()
     # compute tree height
-    myTree.compute_height(myTree.leaves)
-    print(myTree.height)
+    print (myTree.compute_height())
+    #print(myTree.height)
 
     # track time
     elapsed_time = time.time() - start_time
     print('done in ', elapsed_time)
 
 threading.Thread(target=main).start()
+
+# initialize to store levels, starting with leaves and finding parents
+#    list_levels = []
+
+    # def compute_levels(self):
+    #     parents = self.parent[self.leaves]
+    #     # look for nodes that found root
+    #     done_idx = np.where(self.parents < 0)[0]
+    #     # replace that node with value of root node so that code won't choke
+    #     self.parents[done_idx] = self.root
+    #     self.list_levels.append(parents)
+    #
+    #     #check if all leaves found root
+    #     if not done_idx.size == self.leaves.size:
+    #         #ac stopped here
+    #         print (self.list_levels)
