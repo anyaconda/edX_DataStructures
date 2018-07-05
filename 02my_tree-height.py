@@ -5,12 +5,12 @@
 #   given: #of nodes and parents index
 #   compute tree height, using recursion
 #
-# submission #10
+# submission #11
 #   modified original function computeHeight
-#   array instead of list, recursive compute; starting from root and looking at kids
+#   looking at leaves only
 # results
-#   Failed case #18/24: time limit exceeded
-#   Time used: 6.10/3.00, memory used: 37318656/536870912.
+#   Failed case #22/24: time limit exceeded
+#   Time used: 6.51/3.00, memory used: 56582144/536870912
 
 
 import sys, threading
@@ -26,25 +26,25 @@ class Tree:
         self.n = int(sys.stdin.readline())
         self.parent = np.array(sys.stdin.readline().split(), int)
 
-        # get root
-        self.root = np.where(self.parent == -1)[0]
-
+        # find leaves
+        self.leaves = np.setdiff1d(np.arange(self.n), self.parent)
 
     height = 0
     done = 0
-    def compute_height(self, nodes):
+
+    def compute_height(self):
 
         while not self.done:
             self.height += 1
-            #find kids
-            kids = np.nonzero(np.in1d(self.parent, nodes))[0]
+            self.leaves = np.where(self.leaves > -1, self.parent[self.leaves], -1)
 
-            # look for nodes that found kids
-            if kids.size > 0:
-                # this level still has nodes to process
-                self.compute_height(kids)
+            # look for nodes that still have parents
+            if not np.all(self.leaves == -1):
+                self.compute_height()
             else:
-                self.done = 1
+                self.done=1
+
+        return self.height
 
     # original from starter solution
     # def compute_height(self):
@@ -62,8 +62,7 @@ class Tree:
 def main():
     myTree = Tree()
     myTree.read()
-    myTree.compute_height(myTree.root)
-    print(myTree.height)
+    print(myTree.compute_height())
 
 
 threading.Thread(target=main).start()
