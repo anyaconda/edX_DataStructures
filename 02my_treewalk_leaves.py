@@ -5,20 +5,20 @@
 #   given: #of nodes and parents index
 #   compute tree height, using recursion
 #
-# submission #12
+# submission #13
 #   modified original function computeHeight
 #   looking at leaves only
 # results
 #   Failed case #22/24: time limit exceeded
-#   Time used: 6.51/3.00, memory used: 56582144/536870912
+#   Time used: 6.07/3.00, memory used: 37928960/536870912.
 #
 # summary: using np.where for ternary logic
 #   start with leaves, size of array = n of leaves
-#   find leaves parents (recursively), when done set to -1
+#   find leaves parents (recursively), find unique, remove -1
 #   count # of levels.
 #   best performance so far, but short of required 3 seconds for case #22, 23
 #
-# last change: not using flag 'done'
+# last change: not using a fixed size array; dynamically reducing it while looping
 
 
 import sys, threading
@@ -32,31 +32,35 @@ class Tree:
 
     def read(self):
         # given:
-        self.n = int(sys.stdin.readline())
-        self.parent = np.array(sys.stdin.readline().split(),int)
+        #self.n = int(sys.stdin.readline())
+        #self.parent = np.array(sys.stdin.readline().split(),int)
 
         # hardcoded examples
         # ex1
         #self.n = 5  # int(sys.stdin.readline())
-        #temp = '4 -1 4 1 1'  # [-1, 0, 4, 0, 3] #
+        #temp = '-1 0 4 0 3' #'4 -1 4 1 1'  #
         # ex2
-        #self.n = 10
-        #temp = '8 8 5 6 7 3 1 6 -1 5'
-        #self.parent = np.array(temp.split(), int)
+        self.n = 10
+        temp = '8 8 5 6 7 3 1 6 -1 5'
+        self.parent = np.array(temp.split(), int)
 
         self.idx = np.arange(self.n)
+        # get root
+        self.root = np.where(self.parent==-1)[0][0]
         # find leaves
         self.leaves = np.setdiff1d(self.idx, self.parent)
 
 
     # my recursive function - only look at leaves
     def compute_height(self):
-        height = 0
+        height = 1
 
-        while not np.all(self.leaves == -1):
-            #print (self.leaves)
+        while not (self.leaves.size == 1 and self.leaves[0]==self.root):
+            print (self.leaves)
             height += 1
-            self.leaves = np.where(self.leaves > -1, self.parent[self.leaves], -1)
+            _leaves = np.unique(self.parent[self.leaves])
+            self.leaves = _leaves[_leaves != -1]
+            _leaves = None
 
         return height
 
