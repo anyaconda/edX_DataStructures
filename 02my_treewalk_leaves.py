@@ -5,18 +5,18 @@
 #   given: #of nodes and parents index
 #   compute tree height, using recursion
 #
-# submission #13
-#   modified original function computeHeight
-#   looking at leaves only
-# results
-#   Failed case #22/24: time limit exceeded
-#   Time used: 6.07/3.00, memory used: 37928960/536870912.
+# after submission #13 - out of ideas for numpy array approach,
+#   back to submisison #7 with list (not numpy array)
 #
-# summary: using np.where for ternary logic
+#
+# summary: looking at leaves only
 #   start with leaves, size of array = n of leaves
 #   find leaves parents (recursively), find unique, remove -1
 #   count # of levels.
 #   best performance so far, but short of required 3 seconds for case #22, 23
+# results
+#   Failed case #22/24: time limit exceeded
+#   Time used: 6.07/3.00, memory used: 37928960/536870912.
 #
 # last change: not using a fixed size array; dynamically reducing it while looping
 
@@ -32,37 +32,49 @@ class Tree:
 
     def read(self):
         # given:
-        #self.n = int(sys.stdin.readline())
-        #self.parent = np.array(sys.stdin.readline().split(),int)
+        self.n = int(sys.stdin.readline())
+        self.parent = list(map(int, sys.stdin.readline().split()))
 
         # hardcoded examples
         # ex1
-        #self.n = 5  # int(sys.stdin.readline())
-        #temp = '-1 0 4 0 3' #'4 -1 4 1 1'  #
+        #self.n = 5
+        #temp = '4 -1 4 1 1'  # '-1 0 4 0 3' #
         # ex2
-        self.n = 10
-        temp = '8 8 5 6 7 3 1 6 -1 5'
-        self.parent = np.array(temp.split(), int)
+        #self.n = 10
+        #temp = '8 8 5 6 7 3 1 6 -1 5'
+        #self.parent =list(map(int, temp.split()))
 
-        self.idx = np.arange(self.n)
-        # get root
-        self.root = np.where(self.parent==-1)[0][0]
+        self.idx = list(range(self.n))
         # find leaves
-        self.leaves = np.setdiff1d(self.idx, self.parent)
+        self.leaves = list(set(self.idx) - set(self.parent))
 
+
+    def node_height(self, node):
+        height = 0
+
+        i = node
+        while i != -1:
+            height += 1
+            i = self.parent[i]
+
+        return height
 
     # my recursive function - only look at leaves
     def compute_height(self):
-        height = 1
+        maxHeight = 0
 
-        while not (self.leaves.size == 1 and self.leaves[0]==self.root):
-            print (self.leaves)
-            height += 1
-            _leaves = np.unique(self.parent[self.leaves])
-            self.leaves = _leaves[_leaves != -1]
-            _leaves = None
+        return max([ self.node_height(i) for i in self.leaves])
 
-        return height
+        ##moved this up to function node_height and using list comprehension - twice as slow than before
+        # for vertex in self.leaves:
+        #     height = 0
+        #     i = vertex
+        #     while i != -1:
+        #         height += 1
+        #         i = self.parent[i]
+        #     maxHeight = max(maxHeight, height)
+        #
+        # return maxHeight
 
 
     # # my recursive function1 - only look at leaves
