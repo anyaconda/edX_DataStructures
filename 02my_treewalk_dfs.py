@@ -32,13 +32,13 @@ class Tree:
 
     def read(self):
         # given:
-        #self.n = int(sys.stdin.readline())
-        #self.parent = list(map(int, sys.stdin.readline().split()))
+        self.n = int(sys.stdin.readline())
+        self.parent = list(map(int, sys.stdin.readline().split()))
 
         # hardcoded examples
         #ex1
-        self.n = 5  # int(sys.stdin.readline())
-        self.parent = [4, -1, 4, 1, 1]  # [-1, 0, 4, 0, 3]
+        #self.n = 5  # int(sys.stdin.readline())
+        #self.parent = [4, -1, 4, 1, 1]  # [-1, 0, 4, 0, 3]
 
         #ex2
         #self.n = 10
@@ -89,11 +89,11 @@ def main():
     myTree = Tree()
     myTree.read()
 
-    print('Tree root ', myTree.root)
-    print('Tree kids ', myTree.kids)
+    #print('Tree root ', myTree.root)
+    #print('Tree kids ', myTree.kids)
 
-    myTree.TraversePreOrder(myTree.root)
-    print ('Pre-order traversal', myTree.preStack)
+    #myTree.TraversePreOrder(myTree.root)
+    #print ('Pre-order traversal', myTree.preStack)
 
     myTree.TraversePostOrder(myTree.root)
     print ('Post-order traversal', myTree.postStack)
