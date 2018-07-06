@@ -5,12 +5,11 @@
 #   given: #of nodes and parents index
 #   compute tree height, using recursion
 #
-# submission #13
+# submission #14
 #   modified original function computeHeight
-#   looking at leaves only
+#   looking at leaves only, tracking visited nodes by computing their height
 # results
-#   Failed case #22/24: time limit exceeded
-#   Time used: 6.07/3.00, memory used: 37928960/536870912.
+#   Good job! (Max time used: 0.94/3.00, max memory used: 120094720/536870912.)
 
 
 import sys, threading
@@ -24,23 +23,37 @@ class Tree:
 
     def read(self):
         self.n = int(sys.stdin.readline())
-        self.parent = np.array(sys.stdin.readline().split(), int)
+        self.parent = list(map(int, sys.stdin.readline().split()))
 
-        # get root
-        self.root = np.where(self.parent == -1)[0][0]
+        # index
+        self.idx = list(range(self.n))
         # find leaves
-        self.leaves = np.setdiff1d(np.arange(self.n), self.parent)
+        self.leaves = list(set(self.idx) - set(self.parent))
+        # keep track of each visited node & its height
+        self.node_visited = [0] * self.n
+
+    def compute_node_height(self, node):
+        #get parent
+        parent = self.parent[node]
+
+        #if root
+        if parent== -1:
+            return 1
+        #if already visited
+        if self.node_visited[node]:
+            return self.node_visited[node]
+
+        #if not visited, compute its height and add to visited nodes
+        self.node_visited[node] = 1 + self.compute_node_height(parent)
+
+        return self.node_visited[node]
 
     def compute_height(self):
-        height = 1
+        # look at leaves only
+        for vertex in self.leaves:
+            self.compute_node_height(vertex)
 
-        while not (self.leaves.size == 1 and self.leaves[0]==self.root):
-            height += 1
-            _leaves = np.unique(self.parent[self.leaves])
-            self.leaves = _leaves[_leaves != -1]
-            _leaves = None
-
-        return height
+        return max(self.node_visited)
 
     # original from starter solution
     # def compute_height(self):
